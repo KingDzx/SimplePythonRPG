@@ -2,32 +2,34 @@ from random import random,randint
 import os
 from math import *
 ''' Stats are HP, Attack, Defense, Speed'''
-''' All Characters have a power budget of 75'''
+''' All Characters have a MAX power budget of 85 (Max values of each stat in total must not cross 85)'''
 stats = {
-    'Warrior':{'HP':35,'Atk':18,'Def':17,'Spd':3}, # +Def -HP
-    'Mage':{'HP':20,'Atk':27,'Def':15,'Spd':13}, # +Atk -Spd
-    'Rogue':{'HP':15,'Atk':31,'Def':8,'Spd':21}, # +Atk -Def
-    'Archer':{'HP':25,'Atk':19,'Def':17,'Spd':14}, # +Spd -Def
-    'Tank':{'HP':50,'Atk':5,'Def':20,'Spd':3} # +Def +HP -Atk
+    'Warrior':{'HP':randint(25,35),'Atk':randint(16,21),'Def':randint(20,22),'Spd':randint(1,7)}, # +Def -HP
+    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13)}, # +Atk -Spd
+    'Rogue':{'HP':randint(15,20),'Atk':randint(32,34),'Def':randint(9,14),'Spd':randint(15,17)}, # +Atk +Spd -HP
+    'Archer':{'HP':randint(20,25),'Atk':randint(14,19),'Def':randint(11,19),'Spd':randint(20,22)}, # +Spd -Def
+    'Tank':{'HP':randint(35,40),'Atk':randint(3,10),'Def':randint(26,28),'Spd':randint(1,7)} # +Def +HP -Atk
 }
 def createCharacter():  
-    name = raw_input("Enter Character Name \n")
-    rpgClass = raw_input("Enter Wanted Class (Warrior/Mage/Rogue/Archer/Tank) \n")
+    name = input("Enter Character Name \n")
+    rpgClass = input("Enter Wanted Class (Warrior/Mage/Rogue/Archer/Tank) \n")
     level = 5
     inventory = []
     while rpgClass != "Warrior" and rpgClass != "Mage" and rpgClass != "Rogue" and rpgClass != "Archer" and rpgClass != "Tank":
         print ('Please choose a valid class')
-        rpgClass = raw_input("Enter Wanted Class (Warrior/Mage/Rogue/Archer/Tank) \n")
+        rpgClass = input("Enter Wanted Class (Warrior/Mage/Rogue/Archer/Tank) \n")
     player = {name:[stats[rpgClass],level,inventory]}
     return player,rpgClass,name
 
 def battle(num,player,pClass,name,exp,hp):
     enemyAlive = True
     Alive = True
-    enemyLevel = randint((player[name][1]-4),(player[name][1]+4))
+    enemyLevel = randint((player[name][1]-2),(player[name][1]+2))
     if enemyLevel < 1:
         enemyLevel = 1
-    enemy = {'Monster':[round((randint(11,15)*enemyLevel +5)/ player[name][1]) , round((randint(6,15)*enemyLevel +5)/ player[name][1]), round((randint(6,15)*enemyLevel +5) / player[name][1]), round((randint(6,10)*enemyLevel +5) / player[name][1])]}
+    if enemyLevel > 100:
+        enemyLevel = 100
+    enemy = {'Monster':[round((randint(8,10) + (randint(1,3) * enemyLevel))) , round((randint(7,9) + (randint(1,2) * enemyLevel))), round((randint(7,9) + (randint(1,2) * enemyLevel))), round((randint(7,9) + (randint(1,2) * enemyLevel)))]}
     enemyHp = enemy['Monster'][0]
     runAttempt = 1
     while enemyAlive == True and Alive == True:
@@ -37,49 +39,95 @@ def battle(num,player,pClass,name,exp,hp):
         print (name + ": Lv " + str(player[name][1]))
         print (str(hp) + '/' + str(player[name][0]['HP']))
         print ('Attack     Item')
-        choice = raw_input('Run        Stats \n')
+        choice = input('Run        Stats \n')
         choice = choice.lower()
         if choice == 'attack':
-            damage = round(((((2 * player[name][1] / 5 + 2) * player[name][0]['Atk'] * randint(30,100) / enemy['Monster'][2]) / 50) + 2) * random()*100/100)
-            enAttack = round(((((2 * enemyLevel / 5 + 2) * enemy['Monster'][1] * randint(30,100) / player[name][0]['Def']) / 50) + 2) * random()*100/100)
-            if player[name][0]['Spd'] > enemy['Monster'][3]:
-                print ('You did ' + str(damage) + " damage!")
-                enemyHp = enemyHp - damage
+            crit,dodge,damage = calDamage(player[name][0]['Atk'],enemy['Monster'][2],player[name][1])
+            enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],player[name][0]['Def'],enemyLevel)           
+            if turnOrder(player[name][0]['Spd'],enemy['Monster'][3]) == 1:
+                if damage > 0:
+                    if crit == 1:
+                        print ("SMASH! You did " + str(damage) + " critical damage!")
+                    else:
+                        print ('You did ' + str(damage) + " damage!")
+                    enemyHp = enemyHp - damage
+                else:
+                    if dodge == 1:
+                        print ("Ooof, the monster dodged your attack")
+                    else:
+                        print ('Your attack missed!')
+                    
                 if enemyHp <= 0:
                     enemyAlive = False
                     print ('You won the battle!')
-                    gain = round(((random() * 100 * enemyLevel) * 1.25) / 7)
-                    print ('You gained ' + str(gain) + ' exp')
-                    newExp = exp + gain
-                    lvlup = (player[name][1]+1)**3
-                    if newExp > lvlup:
-                        hp = levelUp(newExp,lvlup,player,pClass,hp)
-                    return newExp,hp
-                print ('Monster did ' + str(enAttack) + " damage!")
-                hp = hp - enAttack                                
+                    if player[name][1] < 100:
+                        gain = round(((randint(35,75) * enemyLevel) * 1.5) / 7)
+                        print ('You gained ' + str(gain) + ' exp')
+                        newExp = exp + gain
+                        lvlup = (player[name][1]+1)**3
+                        if newExp > lvlup:
+                            hp = levelUp(newExp,lvlup,player,pClass,hp)
+                        return newExp,hp
+                    return exp,hp
+                
+                if enAttack > 0:
+                    if enCrit == 1:
+                        print ("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                    else:
+                        print ('Monster did ' + str(enAttack) + " damage!")
+                    hp = hp - enAttack 
+                else:
+                    if enDodge == 1:
+                        print ("Nice! you dodged the attack")
+                    else:
+                        print ("Monster's attack missed!")
+                    
                 if hp <= 0:
                     Alive = False
                     print ('You Died...')
                     return exp,hp
             else:
-                print ('Monster did ' + str(enAttack) + " damage!")
-                hp = hp - enAttack                                
+                if enAttack > 0:
+                    if enCrit == 1:
+                        print ("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                    else:
+                        print ('Monster did ' + str(enAttack) + " damage!")
+                    hp = hp - enAttack 
+                else:
+                    if enDodge == 1:
+                        print ("Nice! you dodged the attack")
+                    else:
+                        print ("Monster's attack missed!")
+                    
                 if hp <= 0:
                     Alive = False
                     print ('You Died...')
                     return exp,hp
-                print ('You did ' + str(damage) + " damage!")
-                enemyHp = enemyHp - damage
+                
+                if damage > 0:
+                    if crit == 1:
+                        print ("SMASH! You did " + str(damage) + " critical damage!")
+                    else:
+                        print ('You did ' + str(damage) + " damage!")
+                    enemyHp = enemyHp - damage
+                else:
+                    if dodge == 1:
+                        print ("Ooof, the monster dodged your attack")
+                    else:
+                        print ('Your attack missed!')
+                    
                 if enemyHp <= 0:
                     enemyAlive = False
                     print ('You won the battle!')
-                    gain = round(((random() * 100 * enemyLevel) * 1.25) / 7)
-                    print ('You gained ' + str(gain) + ' exp')
-                    newExp = exp + gain
-                    lvlup = (player[name][1]+1)**3
-                    if newExp > lvlup:
-                        hp = levelUp(newExp,lvlup,player,pClass,hp)
-                    return newExp,hp
+                    if player[name][1] < 100:
+                        gain = round(((randint(35,75) * enemyLevel) * 1.5) / 7)
+                        print ('You gained ' + str(gain) + ' exp')
+                        newExp = exp + gain
+                        lvlup = (player[name][1]+1)**3
+                        if newExp > lvlup:
+                            hp = levelUp(newExp,lvlup,player,pClass,hp)
+                        return newExp,hp
+                    return exp,hp
                 
         elif choice == 'run':
             chance = (((player[name][0]['Spd'] * 32)/enemy['Monster'][3]) +30) * runAttempt
@@ -93,10 +141,19 @@ def battle(num,player,pClass,name,exp,hp):
                     return exp,hp
                 else:
                     print (name + " Tripped and couldn't run!")
-                    runAttempt = runAttempt + 1
-                    enAttack = round(((((2 * player[name][1] / 5 + 2) * enemy['Monster'][1] * 40 / player[name][0]['Def']) / 50) + 2) * random()*100/100)
-                    print ('Monster did ' + str(enAttack) + " damage!")
-                    hp = hp - enAttack
+                    runAttempt += 1
+                    enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],player[name][0]['Def'],enemyLevel)
+                    if enAttack > 0:
+                        if enCrit == 1:
+                            print ("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                        else:
+                            print ('Monster did ' + str(enAttack) + " damage!")
+                        hp = hp - enAttack 
+                    else:
+                        if enDodge == 1:
+                            print ("Nice! you dodged the attack")
+                        else:
+                            print ("Monster's attack missed!")
                     if hp <= 0:
                         Alive = False
                         print ('You Died...')
@@ -107,12 +164,14 @@ def battle(num,player,pClass,name,exp,hp):
                 print ("You have no items")
             else:
                 print (player[name][2])
-                item = raw_input ("Type which item you wish to use or type Back to go back\n")
+                item = input ("Type which item you wish to use or type Back to go back\n")
                 while (item not in player[name][2] and item != 'Back'):
                     print ("This is not an item in your bag, try again")
-                    item = raw_input ("Type which item you wish to use\n")
+                    item = input ("Type which item you wish to use\n")
                 if (item in player[name][2]):
                     player[name][2].remove(item)
+                    if item == 'Mango':
+                         hp = healing(hp)
                 if (item == 'Back'):
                     print ("")
                 
@@ -135,27 +194,33 @@ def battle(num,player,pClass,name,exp,hp):
             
 def levelUp(gain,lvlup,player,Class,HP):
     while gain > lvlup:
+        if player[name][1] == 100:
+            break
         print ('You gained a level!')
-        hpGain = randint(1,10)
-        if Class == 'Warrior':
+        hpGain = randint(2,7)
+        if Class == 'Warrior' or Class == 'Rogue':
             hpGain = int(floor(hpGain * 0.5))
         elif Class == 'Tank':
-            hpGain = randint(5,10)
+            hpGain = randint(7,10)
         atkGain = randint(1,5)
-        if Class == 'Mage' or Class == 'Rogue':
+        if Class == 'Mage':
             atkGain = int(floor(atkGain * 2))
+        elif Class == 'Rogue':
+            atkGain = randint(4,6)
         elif Class == 'Tank':
             atkGain = int(floor(atkGain * 0.5))
         defGain = randint(1,5)
         if Class == 'Warrior':
             defGain = int(floor(defGain * 2))
         elif Class == 'Tank':
-            defGain = randint(4,7)
-        elif Class == 'Archer' or Class == 'Rogue':
+            defGain = randint(4,6)
+        elif Class == 'Archer':
             defGain = int(floor(defGain * 0.5))
         spdGain = randint(1,5)
         if Class == 'Archer':
             spdGain = int(floor(spdGain * 2))
+        if Class == 'Rogue':
+            spdGain = randint(4,6)
         elif Class == 'Mage':
             spdGain = int(floor(spdGain * 0.5))
 
@@ -180,15 +245,21 @@ def situations(num,player,pClass,name,exp,hp):
         
     elif num == 2:
         print ("It's an empty room...")
-        return exp,hp
+        rand = random()
+        if rand <= 0.5:
+            os.system('pause')
+            print ("You turn to leave and an enemy attacks you!")
+            return battle(num,player,pClass,name,exp,hp)
+        else:
+            return exp,hp
 
     elif num == 3:
         print ("You enter a room, there's a chest!")
-        choice = raw_input("Do you want to open it? (Yes/No)")
+        choice = input("Do you want to open it? (Yes/No)")
         choice = choice.lower()
         os.system('CLS')
         while choice != 'yes' and choice != 'no':
-            choice = raw_input ("You must choose to open it or not! (Yes/No)")
+            choice = input ("You must choose to open it or not! (Yes/No)")
             choice = choice.lower()
         if choice == 'no':
             print ("You walked out. You don't trust what the chest might contain")
@@ -200,22 +271,78 @@ def situations(num,player,pClass,name,exp,hp):
                 return battle(num,player,pClass,name,exp,hp)
             else:
                 print ('You Obtained an item!')
-                player[name][2].append('Test')
+                player[name][2].append('Mango')
                 return exp,hp
-            
+
+def critChance():
+    Crit=0
+    critChance = random()
+    if critChance <= 0.1:
+        Crit = 1
+    else:
+        Crit = 0
+    return Crit
+
+def dodgeChance():
+    Dodge = 0
+    dodChance = random()
+    if dodChance <= 0.1:
+        Dodge = 1
+    else:
+        Dodge = 0
+    return Dodge
+
+def calDamage(attack,defense,level):
+    crit = critChance()
+    dodge = dodgeChance()
+    damage = round(((((2 * level / 5 + 2) * attack * randint(30,100) / defense) / 50) + 2) * random())
+    if crit == 1:
+        damage *= 1.5
+    if dodge == 1:
+        damage = 0
+    return crit,dodge,round(damage)
+
+def turnOrder(speed,enSpeed):
+    if speed > enSpeed:
+        return 1
+    elif speed < enSpeed:
+        return 0
+    elif speed == enSpeed:
+        return randint(0,1)
+
+def healing (hp):
+    rand = random()
+    if rand <= 0.1:
+        hp = player[name][0]['HP']
+    elif rand > 0.1 and rand <= 0.25:
+        hp += round(player[name][0]['HP'] * 0.75)
+    elif rand > 0.25 and rand <= 0.50:
+        hp += round(player[name][0]['HP'] * 0.50)
+    elif rand > 0.50:
+        hp += round(player[name][0]['HP'] * 0.25)
+
+    if hp > player[name][0]['HP']:
+        hp = player[name][0]['HP']
+    return hp
 player,pClass,name = createCharacter()
-exp=0
+exp=player[name][1]**3
 leave = False
 hp = player[name][0]['HP']
+print ("Your Stats are:")
+print ('HP: ' + str(player[name][0]['HP']))
+print ('Attack: ' + str(player[name][0]['Atk']))
+print ('Defense: ' + str(player[name][0]['Def']))
+print ('Speed: ' + str(player[name][0]['Spd']))
+os.system('pause')
 os.system('CLS')
-print ("You enter into the Beetham to find the misstress")
+print ("You enter into Laventille Square")
 while leave == False and hp > 0:
     print ('Pick a direction to go')
     print ('       Up      ')
     print ('Left       Right')
     print ('      Down     ')
     print ('                    Exit')
-    choice = raw_input('Type direction or exit to leave game \n')
+    choice = input('Type direction or exit to leave game \n')
     choice = choice.lower()
     os.system('CLS')
     if choice == 'exit':
@@ -239,4 +366,3 @@ while leave == False and hp > 0:
 print ("Thanks for playing!")
 print ("You got to level " + str(player[name][1]))
 os.system('pause')
-
