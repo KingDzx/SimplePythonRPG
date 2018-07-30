@@ -29,11 +29,11 @@ def battle(num,player,pClass,name,exp,hp):
         enemyLevel = 1
     if enemyLevel > 100:
         enemyLevel = 100
-    enemy = {'Monster':[round((randint(8,10) + (randint(1,3) * enemyLevel))) , round((randint(7,9) + (randint(1,2) * enemyLevel))), round((randint(7,9) + (randint(1,2) * enemyLevel))), round((randint(7,9) + (randint(1,2) * enemyLevel)))]}
+    enemy = {'Monster':[round((randint(5,10) + round(randint(1,2) * (random()*3) * enemyLevel))) , round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel))), round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel))), round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel)))]}
     enemyHp = enemy['Monster'][0]
     runAttempt = 1
     while enemyAlive == True and Alive == True:
-        print ('                             ' + str(enemy['Monster']))
+        #print ('                             ' + str(enemy['Monster']))
         print ('                             Monster: Lv ' + str(enemyLevel))
         print ('                             ' + str(enemyHp) + '/' + str(enemy['Monster'][0]))
         print (name + ": Lv " + str(player[name][1]))
@@ -60,15 +60,7 @@ def battle(num,player,pClass,name,exp,hp):
                 if enemyHp <= 0:
                     enemyAlive = False
                     print ('You won the battle!')
-                    if player[name][1] < 100:
-                        gain = round(((randint(35,75) * enemyLevel) * 1.5) / 7)
-                        print ('You gained ' + str(gain) + ' exp')
-                        newExp = exp + gain
-                        lvlup = (player[name][1]+1)**3
-                        if newExp > lvlup:
-                            hp = levelUp(newExp,lvlup,player,pClass,hp)
-                        return newExp,hp
-                    return exp,hp
+                    return levelUp(exp,player,pClass,hp,enemyLevel)
                 
                 if enAttack > 0:
                     if enCrit == 1:
@@ -119,15 +111,7 @@ def battle(num,player,pClass,name,exp,hp):
                 if enemyHp <= 0:
                     enemyAlive = False
                     print ('You won the battle!')
-                    if player[name][1] < 100:
-                        gain = round(((randint(35,75) * enemyLevel) * 1.5) / 7)
-                        print ('You gained ' + str(gain) + ' exp')
-                        newExp = exp + gain
-                        lvlup = (player[name][1]+1)**3
-                        if newExp > lvlup:
-                            hp = levelUp(newExp,lvlup,player,pClass,hp)
-                        return newExp,hp
-                    return exp,hp
+                    return levelUp(exp,player,pClass,hp,enemyLevel)
                 
         elif choice == 'run':
             chance = (((player[name][0]['Spd'] * 32)/enemy['Monster'][3]) +30) * runAttempt
@@ -192,51 +176,60 @@ def battle(num,player,pClass,name,exp,hp):
         os.system('pause')
         os.system('CLS')
             
-def levelUp(gain,lvlup,player,Class,HP):
-    while gain > lvlup:
+def levelUp(exp,player,Class,HP,enemyLevel):
+    gain = round(((randint(35,75) * enemyLevel) * 1.5) / 7)
+    exp = exp + gain 
+    lvlup = (player[name][1]+1)**3
+    print ('You gained ' + str(gain) + ' exp')
+    while exp > lvlup:
         if player[name][1] == 100:
             break
-        print ('You gained a level!')
-        hpGain = randint(2,7)
-        if Class == 'Warrior' or Class == 'Rogue':
-            hpGain = int(floor(hpGain * 0.5))
-        elif Class == 'Tank':
-            hpGain = randint(7,10)
-        atkGain = randint(1,5)
-        if Class == 'Mage':
-            atkGain = int(floor(atkGain * 2))
-        elif Class == 'Rogue':
-            atkGain = randint(4,6)
-        elif Class == 'Tank':
-            atkGain = int(floor(atkGain * 0.5))
-        defGain = randint(1,5)
-        if Class == 'Warrior':
-            defGain = int(floor(defGain * 2))
-        elif Class == 'Tank':
-            defGain = randint(4,6)
-        elif Class == 'Archer':
-            defGain = int(floor(defGain * 0.5))
-        spdGain = randint(1,5)
-        if Class == 'Archer':
-            spdGain = int(floor(spdGain * 2))
-        if Class == 'Rogue':
-            spdGain = randint(4,6)
-        elif Class == 'Mage':
-            spdGain = int(floor(spdGain * 0.5))
+        if player[name][1] < 100:                                   
+            if exp > lvlup:
+                print ('You gained a level!')
+                hpGain = randint(2,7)
+                if Class == 'Warrior' or Class == 'Rogue':
+                    hpGain = int(floor(hpGain * 0.5))
+                elif Class == 'Tank':
+                    hpGain = randint(7,10)
+                    
+                atkGain = randint(1,4)
+                if Class == 'Mage':
+                    atkGain = int(floor(atkGain * 1.5))
+                elif Class == 'Rogue':
+                    atkGain = randint(3,5)
+                elif Class == 'Tank':
+                    atkGain = int(floor(atkGain * 0.5))
+                    
+                defGain = randint(1,4)
+                if Class == 'Warrior':
+                    defGain = int(floor(defGain * 1.5))
+                elif Class == 'Tank':
+                    defGain = randint(3,5)
+                elif Class == 'Archer':
+                    defGain = int(floor(defGain * 0.5))
+                    
+                spdGain = randint(1,4)
+                if Class == 'Archer':
+                    spdGain = int(floor(spdGain * 1.5))
+                if Class == 'Rogue':
+                    spdGain = randint(3,5)
+                elif Class == 'Mage':
+                    spdGain = int(floor(spdGain * 0.5))
 
-        print ('HP: ' + str(player[name][0]['HP']) + ' -> ' + str(player[name][0]['HP'] + hpGain) + ' +' + str(hpGain))
-        print ('Attack: ' + str(player[name][0]['Atk']) + ' -> ' + str(player[name][0]['Atk'] + atkGain) + ' +' + str(atkGain))
-        print ('Defense: ' + str(player[name][0]['Def']) + ' -> ' + str(player[name][0]['Def'] + defGain) + ' +' + str(defGain))
-        print ('Speed: ' + str(player[name][0]['Spd']) + ' -> ' + str(player[name][0]['Spd'] + spdGain) + ' +' + str(spdGain))
-        print ('\n')
-        player[name][1] = player[name][1] + 1
-        player[name][0]['HP'] = player[name][0]['HP'] + hpGain
-        player[name][0]['Atk'] = player[name][0]['Atk'] + atkGain
-        player[name][0]['Def'] = player[name][0]['Def'] + defGain
-        player[name][0]['Spd'] = player[name][0]['Spd'] + spdGain
-        lvlup = (player[name][1]+1)**3
-        HP = HP + hpGain
-    return HP
+                print ('HP: ' + str(player[name][0]['HP']) + ' -> ' + str(player[name][0]['HP'] + hpGain) + ' +' + str(hpGain))
+                print ('Attack: ' + str(player[name][0]['Atk']) + ' -> ' + str(player[name][0]['Atk'] + atkGain) + ' +' + str(atkGain))
+                print ('Defense: ' + str(player[name][0]['Def']) + ' -> ' + str(player[name][0]['Def'] + defGain) + ' +' + str(defGain))
+                print ('Speed: ' + str(player[name][0]['Spd']) + ' -> ' + str(player[name][0]['Spd'] + spdGain) + ' +' + str(spdGain))
+                print ('\n')
+                player[name][1] = player[name][1] + 1
+                player[name][0]['HP'] = player[name][0]['HP'] + hpGain
+                player[name][0]['Atk'] = player[name][0]['Atk'] + atkGain
+                player[name][0]['Def'] = player[name][0]['Def'] + defGain
+                player[name][0]['Spd'] = player[name][0]['Spd'] + spdGain
+                lvlup = (player[name][1]+1)**3
+                HP = HP + hpGain
+    return exp,HP
 
 def situations(num,player,pClass,name,exp,hp):
     if num == 1:
@@ -313,12 +306,16 @@ def turnOrder(speed,enSpeed):
 def healing (hp):
     rand = random()
     if rand <= 0.1:
+        print ("You ate a Super Julie Starch Mango! HP fully restored!")
         hp = player[name][0]['HP']
     elif rand > 0.1 and rand <= 0.25:
+        print ("You ate a Julie Starch Mango! Gained", round(player[name][0]['HP'] * 0.75), "HP!")
         hp += round(player[name][0]['HP'] * 0.75)
     elif rand > 0.25 and rand <= 0.50:
+        print ("You ate a Julie Mango! Gained", round(player[name][0]['HP'] * 0.50), "HP!")
         hp += round(player[name][0]['HP'] * 0.50)
     elif rand > 0.50:
+        print ("You ate a Starch Mango! Gained", round(player[name][0]['HP'] * 0.25), "HP!")
         hp += round(player[name][0]['HP'] * 0.25)
 
     if hp > player[name][0]['HP']:
