@@ -21,25 +21,32 @@ def createCharacter():
     player = {name:[stats[rpgClass],level,inventory]}
     return player,rpgClass,name
 
-def battle(num,player,pClass,name,exp,hp):
+def battle(num,player,pClass,name,exp,hp,boss):
     enemyAlive = True
     Alive = True
+    scanned = False
     enemyLevel = randint((player[name][1]-2),(player[name][1]+2))
     if enemyLevel < 1:
         enemyLevel = 1
     if enemyLevel > 100:
         enemyLevel = 100
-    enemy = {'Monster':[round((randint(5,10) + round(randint(1,2) * (random()*3) * enemyLevel))) , round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel))), round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel))), round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel)))]}
+    if boss == False:
+        enemy = {'Monster':[round((randint(5,10) + round(randint(1,2) * (random()*3) * enemyLevel))) , round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel))), round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel))), round((randint(7,11) + round(randint(1,2) * (random()*2.5) * enemyLevel)))]}
+    else:
+        enemy = {'Monster':[round((randint(15,20) + round(randint(3,4) * (random()*2.75) * enemyLevel))) , round((randint(10,15) + round(randint(3,4) * (random()*2.25) * enemyLevel))), round((randint(10,15) + round(randint(3,4) * (random()*2.25) * enemyLevel))), round((randint(10,15) + round(randint(3,4) * (random()*2.25) * enemyLevel)))]}
     enemyHp = enemy['Monster'][0]
     runAttempt = 1
     while enemyAlive == True and Alive == True:
         #print ('                             ' + str(enemy['Monster']))
-        print ('                             Monster: Lv ' + str(enemyLevel))
+        if boss == False:
+            print ('                             Monster: Lv ' + str(enemyLevel))
+        else:
+            print ('                             Boss: Lv ' + str(enemyLevel))
         print ('                             ' + str(enemyHp) + '/' + str(enemy['Monster'][0]))
         print (name + ": Lv " + str(player[name][1]))
         print (str(hp) + '/' + str(player[name][0]['HP']))
-        print ('Attack     Item')
-        choice = input('Run        Stats \n')
+        print ('Attack      Item        Scan')
+        choice = input('Run         Stats \n')
         choice = choice.lower()
         if choice == 'attack':
             crit,dodge,damage = calDamage(player[name][0]['Atk'],enemy['Monster'][2],player[name][1])
@@ -59,8 +66,14 @@ def battle(num,player,pClass,name,exp,hp):
                     
                 if enemyHp <= 0:
                     enemyAlive = False
-                    print ('You won the battle!')
-                    return levelUp(exp,player,pClass,hp,enemyLevel)
+                    if boss == False:
+                        print ('You won the battle!')
+                    elif boss == True:
+                        print ('You beat the boss!')
+                        os.system('pause')
+                        print ('You Obtained an item!')
+                        player[name][2].append('Mango')
+                    return levelUp(exp,player,pClass,hp,enemyLevel,boss)
                 
                 if enAttack > 0:
                     if enCrit == 1:
@@ -110,15 +123,23 @@ def battle(num,player,pClass,name,exp,hp):
                     
                 if enemyHp <= 0:
                     enemyAlive = False
-                    print ('You won the battle!')
-                    return levelUp(exp,player,pClass,hp,enemyLevel)
+                    if boss == False:
+                        print ('You won the battle!')
+                    elif boss == True:
+                        print ('You beat the boss!')
+                        os.system('pause')
+                        print ('You Obtained an item!')
+                        player[name][2].append('Mango')
+                    return levelUp(exp,player,pClass,hp,enemyLevel,boss)
                 
         elif choice == 'run':
-            chance = (((player[name][0]['Spd'] * 32)/enemy['Monster'][3]) +30) * runAttempt
-            if chance > 255:
-                print (name + " Ran Away!")
-                return exp,hp
+            if boss == True:
+                print ("You cannot run from the boss!")
             else:
+                num1 = enemy['Monster'][3]/4
+                if num1 < 1:
+                    num1 = 1
+                chance = (((player[name][0]['Spd'] * 32)/ num1) + 30) * runAttempt / 256
                 willIRun = randint(0,255)
                 if chance < willIRun:
                     print (name + " Ran Away!")
@@ -169,17 +190,36 @@ def battle(num,player,pClass,name,exp,hp):
         elif choice == 'heal':
             print ("Shhhhhhh don't tell anyone about this command ;)")
             hp = player[name][0]['HP']
-            
+
+        elif choice == 'scan':
+            if scanned == False:
+                stat = randint(1,10)
+                if stat <= 4:
+                    print ("Monster's Attack:",enemy['Monster'][1])
+                if stat > 4 and stat <= 8:
+                    print ("Monster's Defense:",enemy['Monster'][2])
+                if stat > 8:
+                    print ("Monster's Speed:",enemy['Monster'][3])
+                scanned = True
+            else:
+                print ("You have already scanned this enemy!")
         else:
             print ("Not a valid choice")
             
         os.system('pause')
         os.system('CLS')
             
-def levelUp(exp,player,Class,HP,enemyLevel):
-    gain = round(((randint(35,75) * enemyLevel) * 1.5) / 7)
+def levelUp(exp,player,Class,HP,enemyLevel,boss):
+    nextLevel = player[name][1]+1
+    A = (enemyLevel * 2) + 10
+    C = (enemyLevel + player[name][1] + 10)
+    if boss == False:
+        B = (randint(35,75) * enemyLevel) /5
+    else:
+        B = (randint(150,250) * enemyLevel) /5 * 1.5
+    gain = floor(floor(sqrt(A) * (A*A)) * B / floor(sqrt(C) * (C*C)))+1
     exp = exp + gain 
-    lvlup = (player[name][1]+1)**3
+    lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140) #(player[name][1]+1)**3
     print ('You gained ' + str(gain) + ' exp')
     while exp > lvlup:
         if player[name][1] == 100:
@@ -227,22 +267,27 @@ def levelUp(exp,player,Class,HP,enemyLevel):
                 player[name][0]['Atk'] = player[name][0]['Atk'] + atkGain
                 player[name][0]['Def'] = player[name][0]['Def'] + defGain
                 player[name][0]['Spd'] = player[name][0]['Spd'] + spdGain
-                lvlup = (player[name][1]+1)**3
+                nextLevel = player[name][1]+1
+                lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)
                 HP = HP + hpGain
     return exp,HP
 
 def situations(num,player,pClass,name,exp,hp):
     if num == 1:
         print ('You come face to face with an enemy. What will you do? (Type to choose choice)')
-        return battle(num,player,pClass,name,exp,hp)
+        return battle(num,player,pClass,name,exp,hp,False)
         
     elif num == 2:
         print ("It's an empty room...")
         rand = random()
-        if rand <= 0.5:
+        if rand <= 0.45:
             os.system('pause')
             print ("You turn to leave and an enemy attacks you!")
-            return battle(num,player,pClass,name,exp,hp)
+            return battle(num,player,pClass,name,exp,hp,False)
+        if rand >0.45 and rand < 0.50:
+            os.system('pause')
+            print ("The boss comes out of the shadows! You have to fight!")
+            return battle(num,player,pClass,name,exp,hp,True)
         else:
             return exp,hp
 
@@ -258,10 +303,10 @@ def situations(num,player,pClass,name,exp,hp):
             print ("You walked out. You don't trust what the chest might contain")
             return exp,hp
         elif choice == 'yes':
-            encounter = randint(1,10)
-            if encounter%2 == 0:
+            encounter = random()
+            if encounter <= 0.4:
                 print ("You encounter an enemy!")
-                return battle(num,player,pClass,name,exp,hp)
+                return battle(num,player,pClass,name,exp,hp,False)
             else:
                 print ('You Obtained an item!')
                 player[name][2].append('Mango')
@@ -288,7 +333,7 @@ def dodgeChance():
 def calDamage(attack,defense,level):
     crit = critChance()
     dodge = dodgeChance()
-    damage = round(((((2 * level / 5 + 2) * attack * randint(30,100) / defense) / 50) + 2) * random())
+    damage = round(((((2 * level / 5 + 2) * attack * randint(30,100) / defense) / 50) + 2) * randint(1,100) / 100)
     if crit == 1:
         damage *= 1.5
     if dodge == 1:
@@ -308,13 +353,13 @@ def healing (hp):
     if rand <= 0.1:
         print ("You ate a Super Julie Starch Mango! HP fully restored!")
         hp = player[name][0]['HP']
-    elif rand > 0.1 and rand <= 0.25:
+    elif rand > 0.10 and rand <= 0.30:
         print ("You ate a Julie Starch Mango! Gained", round(player[name][0]['HP'] * 0.75), "HP!")
         hp += round(player[name][0]['HP'] * 0.75)
-    elif rand > 0.25 and rand <= 0.50:
+    elif rand > 0.30 and rand <= 0.65:
         print ("You ate a Julie Mango! Gained", round(player[name][0]['HP'] * 0.50), "HP!")
         hp += round(player[name][0]['HP'] * 0.50)
-    elif rand > 0.50:
+    elif rand > 0.65:
         print ("You ate a Starch Mango! Gained", round(player[name][0]['HP'] * 0.25), "HP!")
         hp += round(player[name][0]['HP'] * 0.25)
 
@@ -346,11 +391,11 @@ while leave == False and hp > 0:
         leave = True
     elif choice == 'up' or choice == 'down' or choice == 'left' or choice == 'right' :
         sit = random()
-        if sit <= 0.5:
+        if sit <= 0.4:
             num = 1
-        elif sit > 0.5 and sit <= 0.75:
+        elif sit > 0.4 and sit <= 0.70:
             num = 2
-        elif sit > 0.75 and sit <= 1.0:
+        elif sit > 0.70 and sit <= 1.0:
             num = 3
         new = situations(num,player,pClass,name,exp,hp)
         exp = new[0]
