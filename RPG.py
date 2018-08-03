@@ -4,24 +4,24 @@ from math import *
 ''' Stats are HP, Attack, Defense, Speed'''
 ''' All Characters have a MAX power budget of 85 (Max values of each stat in total must not cross 85)'''
 stats = {
-    'Warrior':{'HP':randint(25,35),'Atk':randint(16,21),'Def':randint(20,22),'Spd':randint(1,7)}, # +Def -HP
-    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13)}, # +Atk -Spd
-    'Rogue':{'HP':randint(15,20),'Atk':randint(32,34),'Def':randint(9,14),'Spd':randint(15,17)}, # +Atk +Spd -HP
-    'Archer':{'HP':randint(20,25),'Atk':randint(14,19),'Def':randint(11,19),'Spd':randint(20,22)}, # +Spd -Def
-    'Tank':{'HP':randint(35,40),'Atk':randint(3,10),'Def':randint(26,28),'Spd':randint(1,7)} # +Def +HP -Atk
+    'Warrior':{'HP':randint(25,35),'Atk':randint(19,21),'Def':randint(20,22),'Spd':randint(1,7),'Mana':30}, # +Atk +Def -HP
+    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13),'Mana':30}, # +Atk -Spd
+    'Assassin':{'HP':randint(15,20),'Atk':randint(32,34),'Def':randint(9,14),'Spd':randint(15,17),'Mana':30}, # +Atk +Spd -HP
+    'Marksman':{'HP':randint(20,25),'Atk':randint(14,19),'Def':randint(11,19),'Spd':randint(20,22),'Mana':30}, # +Spd -Def
+    'Tank':{'HP':randint(35,40),'Atk':randint(1,8),'Def':randint(29,31),'Spd':randint(1,6),'Mana':30} # +Def +HP -Atk
 }
 def createCharacter():  
     name = input("Enter Character Name \n")
-    rpgClass = input("Enter Wanted Class (Warrior/Mage/Rogue/Archer/Tank) \n")
+    rpgClass = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
     level = 5
     inventory = []
-    while rpgClass != "Warrior" and rpgClass != "Mage" and rpgClass != "Rogue" and rpgClass != "Archer" and rpgClass != "Tank":
+    while rpgClass != "Warrior" and rpgClass != "Mage" and rpgClass != "Assassin" and rpgClass != "Marksman" and rpgClass != "Tank":
         print ('Please choose a valid class')
-        rpgClass = input("Enter Wanted Class (Warrior/Mage/Rogue/Archer/Tank) \n")
+        rpgClass = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
     player = {name:[stats[rpgClass],level,inventory]}
     return player,rpgClass,name
 
-def battle(num,player,pClass,name,exp,hp,boss):
+def battle(num,player,pClass,name,exp,hp,mana,boss):
     enemyAlive = True
     Alive = True
     scanned = False
@@ -42,9 +42,10 @@ def battle(num,player,pClass,name,exp,hp,boss):
             print ('                             Monster: Lv ' + str(enemyLevel))
         else:
             print ('                             Boss: Lv ' + str(enemyLevel))
-        print ('                             ' + str(enemyHp) + '/' + str(enemy['Monster'][0]))
+        print ('                             HP: ' + str(enemyHp) + '/' + str(enemy['Monster'][0]))
         print (name + ": Lv " + str(player[name][1]))
-        print (str(hp) + '/' + str(player[name][0]['HP']))
+        print ("HP:   " + str(hp) + '/' + str(player[name][0]['HP']))
+        print ("Mana: " + str(mana) + '/' + str(player[name][0]['Mana']))
         print ('Attack      Item        Scan')
         choice = input('Run         Stats \n')
         choice = choice.lower()
@@ -70,10 +71,9 @@ def battle(num,player,pClass,name,exp,hp,boss):
                         print ('You won the battle!')
                     elif boss == True:
                         print ('You beat the boss!')
-                        os.system('pause')
                         print ('You Obtained an item!')
                         player[name][2].append('Mango')
-                    return levelUp(exp,player,pClass,hp,enemyLevel,boss)
+                    return levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
                 
                 if enAttack > 0:
                     if enCrit == 1:
@@ -90,7 +90,7 @@ def battle(num,player,pClass,name,exp,hp,boss):
                 if hp <= 0:
                     Alive = False
                     print ('You Died...')
-                    return exp,hp
+                    return exp,hp,mana
             else:
                 if enAttack > 0:
                     if enCrit == 1:
@@ -107,7 +107,7 @@ def battle(num,player,pClass,name,exp,hp,boss):
                 if hp <= 0:
                     Alive = False
                     print ('You Died...')
-                    return exp,hp
+                    return exp,hp,mana
                 
                 if damage > 0:
                     if crit == 1:
@@ -127,10 +127,9 @@ def battle(num,player,pClass,name,exp,hp,boss):
                         print ('You won the battle!')
                     elif boss == True:
                         print ('You beat the boss!')
-                        os.system('pause')
                         print ('You Obtained an item!')
                         player[name][2].append('Mango')
-                    return levelUp(exp,player,pClass,hp,enemyLevel,boss)
+                    return levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
                 
         elif choice == 'run':
             if boss == True:
@@ -143,7 +142,7 @@ def battle(num,player,pClass,name,exp,hp,boss):
                 willIRun = randint(0,255)
                 if chance < willIRun:
                     print (name + " Ran Away!")
-                    return exp,hp
+                    return exp,hp,mana
                 else:
                     print (name + " Tripped and couldn't run!")
                     runAttempt += 1
@@ -162,7 +161,7 @@ def battle(num,player,pClass,name,exp,hp,boss):
                     if hp <= 0:
                         Alive = False
                         print ('You Died...')
-                        return exp,hp
+                        return exp,hp,mana
                     
         elif choice == 'item':
             if len(player[name][2]) == 0:
@@ -186,6 +185,7 @@ def battle(num,player,pClass,name,exp,hp,boss):
             print ('Attack: ' + str(stats['Atk']))
             print ('Defense: ' + str(stats['Def']))
             print ('Speed: ' + str(stats['Spd']))
+            print ('Mana: ' + str(stats['Mana']))
             
         elif choice == 'heal':
             print ("Shhhhhhh don't tell anyone about this command ;)")
@@ -209,7 +209,7 @@ def battle(num,player,pClass,name,exp,hp,boss):
         os.system('pause')
         os.system('CLS')
             
-def levelUp(exp,player,Class,HP,enemyLevel,boss):
+def levelUp(exp,player,Class,HP,mana,enemyLevel,boss):
     nextLevel = player[name][1]+1
     A = (enemyLevel * 2) + 10
     C = (enemyLevel + player[name][1] + 10)
@@ -228,7 +228,7 @@ def levelUp(exp,player,Class,HP,enemyLevel,boss):
             if exp > lvlup:
                 print ('You gained a level!')
                 hpGain = randint(2,7)
-                if Class == 'Warrior' or Class == 'Rogue':
+                if Class == 'Warrior' or Class == 'Assassin':
                     hpGain = int(floor(hpGain * 0.5))
                 elif Class == 'Tank':
                     hpGain = randint(7,10)
@@ -236,46 +236,49 @@ def levelUp(exp,player,Class,HP,enemyLevel,boss):
                 atkGain = randint(1,4)
                 if Class == 'Mage':
                     atkGain = int(floor(atkGain * 1.5))
-                elif Class == 'Rogue':
+                elif Class == 'Assassin' or Class == "Warrior":
                     atkGain = randint(3,5)
                 elif Class == 'Tank':
                     atkGain = int(floor(atkGain * 0.5))
                     
                 defGain = randint(1,4)
-                if Class == 'Warrior':
-                    defGain = int(floor(defGain * 1.5))
-                elif Class == 'Tank':
+                if Class == 'Tank' or Class == 'Warrior':
                     defGain = randint(3,5)
-                elif Class == 'Archer':
+                elif Class == 'Marksman':
                     defGain = int(floor(defGain * 0.5))
                     
                 spdGain = randint(1,4)
-                if Class == 'Archer':
+                if Class == 'Marksman':
                     spdGain = int(floor(spdGain * 1.5))
-                if Class == 'Rogue':
+                if Class == 'Assassin':
                     spdGain = randint(3,5)
                 elif Class == 'Mage':
                     spdGain = int(floor(spdGain * 0.5))
 
+                manaGain = randint(5,10)
+                
                 print ('HP: ' + str(player[name][0]['HP']) + ' -> ' + str(player[name][0]['HP'] + hpGain) + ' +' + str(hpGain))
                 print ('Attack: ' + str(player[name][0]['Atk']) + ' -> ' + str(player[name][0]['Atk'] + atkGain) + ' +' + str(atkGain))
                 print ('Defense: ' + str(player[name][0]['Def']) + ' -> ' + str(player[name][0]['Def'] + defGain) + ' +' + str(defGain))
                 print ('Speed: ' + str(player[name][0]['Spd']) + ' -> ' + str(player[name][0]['Spd'] + spdGain) + ' +' + str(spdGain))
+                print ('Mana: ' + str(player[name][0]['Mana']) + ' -> ' + str(player[name][0]['Mana'] + manaGain) + ' +' + str(manaGain))
                 print ('\n')
                 player[name][1] = player[name][1] + 1
                 player[name][0]['HP'] = player[name][0]['HP'] + hpGain
                 player[name][0]['Atk'] = player[name][0]['Atk'] + atkGain
                 player[name][0]['Def'] = player[name][0]['Def'] + defGain
                 player[name][0]['Spd'] = player[name][0]['Spd'] + spdGain
+                player[name][0]['Mana'] = player[name][0]['Mana'] + manaGain
                 nextLevel = player[name][1]+1
                 lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)
                 HP = HP + hpGain
-    return exp,HP
+                mana = mana + manaGain
+    return exp,HP,mana
 
-def situations(num,player,pClass,name,exp,hp):
+def situations(num,player,pClass,name,exp,hp,mana):
     if num == 1:
         print ('You come face to face with an enemy. What will you do? (Type to choose choice)')
-        return battle(num,player,pClass,name,exp,hp,False)
+        return battle(num,player,pClass,name,exp,hp,mana,False)
         
     elif num == 2:
         print ("It's an empty room...")
@@ -283,13 +286,13 @@ def situations(num,player,pClass,name,exp,hp):
         if rand <= 0.45:
             os.system('pause')
             print ("You turn to leave and an enemy attacks you!")
-            return battle(num,player,pClass,name,exp,hp,False)
+            return battle(num,player,pClass,name,exp,hp,mana,False)
         if rand >0.45 and rand < 0.50:
             os.system('pause')
             print ("The boss comes out of the shadows! You have to fight!")
-            return battle(num,player,pClass,name,exp,hp,True)
+            return battle(num,player,pClass,name,exp,hp,mana,True)
         else:
-            return exp,hp
+            return exp,hp,mana
 
     elif num == 3:
         print ("You enter a room, there's a chest!")
@@ -306,11 +309,11 @@ def situations(num,player,pClass,name,exp,hp):
             encounter = random()
             if encounter <= 0.4:
                 print ("You encounter an enemy!")
-                return battle(num,player,pClass,name,exp,hp,False)
+                return battle(num,player,pClass,name,exp,hp,mana,False)
             else:
                 print ('You Obtained an item!')
                 player[name][2].append('Mango')
-                return exp,hp
+                return exp,hp,mana
 
 def critChance():
     Crit=0
@@ -370,11 +373,13 @@ player,pClass,name = createCharacter()
 exp=player[name][1]**3
 leave = False
 hp = player[name][0]['HP']
+mana = player[name][0]['Mana']
 print ("Your Stats are:")
 print ('HP: ' + str(player[name][0]['HP']))
 print ('Attack: ' + str(player[name][0]['Atk']))
 print ('Defense: ' + str(player[name][0]['Def']))
 print ('Speed: ' + str(player[name][0]['Spd']))
+print ('Mana: ' + str(player[name][0]['Mana']))
 os.system('pause')
 os.system('CLS')
 print ("You enter into Laventille Square")
@@ -397,9 +402,10 @@ while leave == False and hp > 0:
             num = 2
         elif sit > 0.70 and sit <= 1.0:
             num = 3
-        new = situations(num,player,pClass,name,exp,hp)
+        new = situations(num,player,pClass,name,exp,hp,mana)
         exp = new[0]
         hp = new[1]
+        mana = new[2]
     else:
         print ("Not a choice, please enter a valid choice")
     os.system('pause')
