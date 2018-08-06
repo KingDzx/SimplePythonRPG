@@ -4,11 +4,11 @@ from math import *
 ''' Stats are HP, Attack, Defense, Speed'''
 ''' All Characters have a MAX power budget of 85 (Max values of each stat in total must not cross 85)'''
 stats = {
-    'Warrior':{'HP':randint(25,35),'Atk':randint(19,21),'Def':randint(20,22),'Spd':randint(1,7),'Mana':30}, # +Atk +Def -HP
-    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13),'Mana':30}, # +Atk -Spd
-    'Assassin':{'HP':randint(15,20),'Atk':randint(32,34),'Def':randint(9,14),'Spd':randint(15,17),'Mana':30}, # +Atk +Spd -HP
-    'Marksman':{'HP':randint(20,25),'Atk':randint(14,19),'Def':randint(11,19),'Spd':randint(20,22),'Mana':30}, # +Spd -Def
-    'Tank':{'HP':randint(35,40),'Atk':randint(1,8),'Def':randint(29,31),'Spd':randint(1,6),'Mana':30} # +Def +HP -Atk
+    'Warrior':{'HP':randint(25,35),'Atk':randint(19,21),'Def':randint(20,22),'Spd':randint(1,7),'Mana':30,'Subclass':{'Brusier':False , 'Paladin':False}}, # +Atk +Def -HP
+    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13),'Mana':30,'Subclass':{'Wizard':False , 'Hemomancer':False}}, # +Atk -Spd
+    'Assassin':{'HP':randint(15,20),'Atk':randint(32,34),'Def':randint(9,14),'Spd':randint(15,17),'Mana':30,'Subclass':{'Ninja':False , 'Rogue':False}}, # +Atk +Spd -HP
+    'Marksman':{'HP':randint(20,25),'Atk':randint(14,19),'Def':randint(11,19),'Spd':randint(20,22),'Mana':30,'Subclass':{'Sniper':False , 'Archer':False}}, # +Spd -Def
+    'Tank':{'HP':randint(35,40),'Atk':randint(1,8),'Def':randint(29,31),'Spd':randint(1,6),'Mana':30,'Subclass':{'Vanguard':False , 'Warden':False}} # +Def +HP -Atk
 }
 def createCharacter():  
     name = input("Enter Character Name \n")
@@ -18,6 +18,12 @@ def createCharacter():
     while rpgClass != "Warrior" and rpgClass != "Mage" and rpgClass != "Assassin" and rpgClass != "Marksman" and rpgClass != "Tank":
         print ('Please choose a valid class')
         rpgClass = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
+    subclassChoice = list(stats[rpgClass]['Subclass'].keys())
+    subclass = input("Select a subclass from " + subclassChoice[0] + " or " + subclassChoice[1] + "\n")
+    while subclass not in subclassChoice:
+        print ('Please choose a subclass from the list provided')
+        subclass = input("Select a subclass from " + subclassChoice[0] + " or " + subclassChoice[1] + "\n")
+    stats[rpgClass]['Subclass'][subclass] = True
     player = {name:[stats[rpgClass],level,inventory]}
     return player,rpgClass,name
 
@@ -47,7 +53,7 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
         print ("HP:   " + str(hp) + '/' + str(player[name][0]['HP']))
         print ("Mana: " + str(mana) + '/' + str(player[name][0]['Mana']))
         print ('Attack      Item        Scan')
-        choice = input('Run         Stats \n')
+        choice = input('Stats       Special     Run\n')
         choice = choice.lower()
         if choice == 'attack':
             crit,dodge,damage = calDamage(player[name][0]['Atk'],enemy['Monster'][2],player[name][1])
@@ -203,11 +209,17 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
                 scanned = True
             else:
                 print ("You have already scanned this enemy!")
+
+        elif choice == 'special':
+            print ("Coming Soon™!")
+            
         else:
             print ("Not a valid choice")
-            
         os.system('pause')
         os.system('CLS')
+
+def specialAttack(subClass,mana):
+    prubt("Nothing")
             
 def levelUp(exp,player,Class,HP,mana,enemyLevel,boss):
     nextLevel = player[name][1]+1

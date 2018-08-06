@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['RPG.py'],
-             pathex=['C:\\Users\\dzach\\Desktop\\RPG'],
+             pathex=['C:\\Users\\dzach\\AppData\\Local\\Programs\\Python\\Python37,C:\\Users\\dzach\\AppData\\Local\\Programs\\Python\\Python37\\DLLs', 'C:\\Users\\dzach\\Desktop\\Github Folder\\SimplePythonRPG'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -24,6 +24,6 @@ exe = EXE(pyz,
           name='RPG',
           debug=False,
           strip=False,
-          upx=True,
+          upx=False,
           runtime_tmpdir=None,
           console=True )
