@@ -5,29 +5,34 @@ from math import *
 ''' All Characters have a MAX power budget of 85 (Max values of each stat in total must not cross 85)'''
 stats = {
     'Warrior':{'HP':randint(25,35),'Atk':randint(19,21),'Def':randint(20,22),'Spd':randint(1,7),'Mana':30,'Subclass':{'Brusier':False , 'Paladin':False}}, # +Atk +Def -HP
-    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13),'Mana':30,'Subclass':{'Wizard':False , 'Hemomancer':False}}, # +Atk -Spd
+    'Mage':{'HP':randint(15,20),'Atk':randint(28,30),'Def':randint(17,22),'Spd':randint(5,13),'Mana':30,'Subclass':{'Wizard':False , 'Hemomancer':False}}, # +Atk +Mana -Spd
     'Assassin':{'HP':randint(15,20),'Atk':randint(32,34),'Def':randint(9,14),'Spd':randint(15,17),'Mana':30,'Subclass':{'Ninja':False , 'Rogue':False}}, # +Atk +Spd -HP
     'Marksman':{'HP':randint(20,25),'Atk':randint(14,19),'Def':randint(11,19),'Spd':randint(20,22),'Mana':30,'Subclass':{'Sniper':False , 'Archer':False}}, # +Spd -Def
     'Tank':{'HP':randint(35,40),'Atk':randint(1,8),'Def':randint(29,31),'Spd':randint(1,6),'Mana':30,'Subclass':{'Vanguard':False , 'Warden':False}} # +Def +HP -Atk
 }
+items = ["Mango","Chenette","Doubles"]
 def createCharacter():  
     name = input("Enter Character Name \n")
     rpgClass = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
+    rpgClass = rpgClass.capitalize()
     level = 5
     inventory = []
     while rpgClass != "Warrior" and rpgClass != "Mage" and rpgClass != "Assassin" and rpgClass != "Marksman" and rpgClass != "Tank":
         print ('Please choose a valid class')
         rpgClass = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
+        rpgClass = rpgClass.capitalize()
     subclassChoice = list(stats[rpgClass]['Subclass'].keys())
     subclass = input("Select a subclass from " + subclassChoice[0] + " or " + subclassChoice[1] + "\n")
+    subclass = subclass.capitalize()
     while subclass not in subclassChoice:
         print ('Please choose a subclass from the list provided')
         subclass = input("Select a subclass from " + subclassChoice[0] + " or " + subclassChoice[1] + "\n")
+        subclass = subclass.capitalize()
     stats[rpgClass]['Subclass'][subclass] = True
     player = {name:[stats[rpgClass],level,inventory]}
     return player,rpgClass,name
 
-def battle(num,player,pClass,name,exp,hp,mana,boss):
+def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
     enemyAlive = True
     Alive = True
     scanned = False
@@ -49,7 +54,7 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
         else:
             print ('                             Boss: Lv ' + str(enemyLevel))
         print ('                             HP: ' + str(enemyHp) + '/' + str(enemy['Monster'][0]))
-        print (name + ": Lv " + str(player[name][1]))
+        print (name + " The " + subclass + ": Lv " + str(player[name][1]))
         print ("HP:   " + str(hp) + '/' + str(player[name][0]['HP']))
         print ("Mana: " + str(mana) + '/' + str(player[name][0]['Mana']))
         print ('Attack      Item        Scan')
@@ -78,7 +83,7 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
                     elif boss == True:
                         print ('You beat the boss!')
                         print ('You Obtained an item!')
-                        player[name][2].append('Mango')
+                        player[name][2].append(items[randint(0,2)])
                     return levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
                 
                 if enAttack > 0:
@@ -134,7 +139,7 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
                     elif boss == True:
                         print ('You beat the boss!')
                         print ('You Obtained an item!')
-                        player[name][2].append('Mango')
+                        player[name][2].append(items[randint(0,2)])
                     return levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
                 
         elif choice == 'run':
@@ -175,28 +180,26 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
             else:
                 print (player[name][2])
                 item = input ("Type which item you wish to use or type Back to go back\n")
+                item = item.capitalize()
                 while (item not in player[name][2] and item != 'Back'):
                     print ("This is not an item in your bag, try again")
                     item = input ("Type which item you wish to use\n")
+                    item = item.capitalize()
                 if (item in player[name][2]):
                     player[name][2].remove(item)
                     if item == 'Mango':
-                         hp = healing(hp)
+                        hp = healing(hp)
+                    if item == 'Chenette':
+                        mana = manaRestore(mana)
                 if (item == 'Back'):
                     print ("")
                 
         elif choice == 'stats':
             stats = player[name][0]
-            print ('HP: ' + str(stats['HP']))
             print ('Attack: ' + str(stats['Atk']))
             print ('Defense: ' + str(stats['Def']))
             print ('Speed: ' + str(stats['Spd']))
-            print ('Mana: ' + str(stats['Mana']))
             
-        elif choice == 'heal':
-            print ("Shhhhhhh don't tell anyone about this command ;)")
-            hp = player[name][0]['HP']
-
         elif choice == 'scan':
             if scanned == False:
                 stat = randint(1,10)
@@ -211,15 +214,118 @@ def battle(num,player,pClass,name,exp,hp,mana,boss):
                 print ("You have already scanned this enemy!")
 
         elif choice == 'special':
-            print ("Coming Soon™!")
-            
+            enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],player[name][0]['Def'],enemyLevel)
+            if turnOrder(player[name][0]['Spd'],enemy['Monster'][3]) == 1:                
+                exp,hp,mana,enemyHp,enemyAlive = specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel)
+                if enemyAlive == False:         
+                    return exp,hp,mana
+                
+                if enAttack > 0:
+                    if enCrit == 1:
+                        print ("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                    else:
+                        print ('Monster did ' + str(enAttack) + " damage!")
+                    hp = hp - enAttack 
+                else:
+                    if enDodge == 1:
+                        print ("Nice! you dodged the attack")
+                    else:
+                        print ("Monster's attack missed!")
+                    
+                if hp <= 0:
+                    Alive = False
+                    print ('You Died...')
+                    return exp,hp,mana
+            else:
+                if enAttack > 0:
+                    if enCrit == 1:
+                        print ("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                    else:
+                        print ('Monster did ' + str(enAttack) + " damage!")
+                    hp = hp - enAttack 
+                else:
+                    if enDodge == 1:
+                        print ("Nice! you dodged the attack")
+                    else:
+                        print ("Monster's attack missed!")
+                    
+                if hp <= 0:
+                    Alive = False
+                    print ('You Died...')
+                    return exp,hp,mana
+
+                exp,hp,mana,enemyHp,enemyAlive = specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel)
+                if enemyAlive == False:
+                    return exp,hp,mana
         else:
             print ("Not a valid choice")
         os.system('pause')
         os.system('CLS')
 
-def specialAttack(subClass,mana):
-    prubt("Nothing")
+def specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel):
+    alive = True
+    if subclass == 'Brusier':
+        print("Coming Soon™!")
+        
+    elif subclass == 'Paladin':
+        if mana >= 25:
+            mana = mana - 25
+            hp = hp + round(player[name][0]['HP'] * 0.75)
+            print ("You blessed yourself with a holy light!")
+            print ("You healed " + str(round(player[name][0]['HP'] * 0.75)) + " HP")
+            if hp > player[name][0]['HP']:
+                hp = player[name][0]['HP']
+        else:
+            print ("Not Enough Mana!")
+            
+    elif subclass == 'Wizard':
+        print("Coming Soon™!")
+        
+    elif subclass == 'Hemomancer':
+        if mana >= 20:
+            mana = mana - 20
+            print ("You use your magic to manipulate the enemy's blood!")
+            damage = round(((((2 * player[name][1] / 5 + 2) * player[name][0]['Atk'] * randint(30,100) / enemy['Monster'][2]) / 50) + 2) * randint(1,100) / 100)
+            hp = hp + round(damage * 0.67)
+            if hp > player[name][0]['HP']:
+                hp = player[name][0]['HP']
+            enemyHp -= damage
+            if damage == 0:
+                print ("You tried to cast your magic but it failed!")
+                mana = mana + 10
+            else:
+                print ("You dealt " + str(damage) + " damage and healed for two thirds of that")
+            if enemyHp < 0:
+                if boss == False:
+                    print ('You won the battle!')
+                elif boss == True:
+                    print ('You beat the boss!')
+                    print ('You Obtained an item!')
+                    player[name][2].append(items[randint(0,2)])
+                exp,hp,mana = levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
+                alive = False
+        else:
+            print ("Not Enough Mana!")
+            
+    elif subclass == "Ninja":
+        print("Coming Soon™!")
+        
+    elif subclass == "Rogue":
+        print("Coming Soon™!")
+        
+    elif subclass == "Sniper":
+        print("Coming Soon™!")
+        
+    elif subclass == "Archer":
+        print("Coming Soon™!")
+        
+    elif subclass == "Vanguard":
+        print("Coming Soon™!")
+        
+    elif subclass == "Warden":
+        print("Coming Soon™!")
+        
+    return exp,hp,mana,enemyHp,alive
             
 def levelUp(exp,player,Class,HP,mana,enemyLevel,boss):
     nextLevel = player[name][1]+1
@@ -268,6 +374,8 @@ def levelUp(exp,player,Class,HP,mana,enemyLevel,boss):
                     spdGain = int(floor(spdGain * 0.5))
 
                 manaGain = randint(5,10)
+                if Class == 'Mage':
+                    manaGain = int(floor(manaGain * 1.5))
                 
                 print ('HP: ' + str(player[name][0]['HP']) + ' -> ' + str(player[name][0]['HP'] + hpGain) + ' +' + str(hpGain))
                 print ('Attack: ' + str(player[name][0]['Atk']) + ' -> ' + str(player[name][0]['Atk'] + atkGain) + ' +' + str(atkGain))
@@ -287,10 +395,10 @@ def levelUp(exp,player,Class,HP,mana,enemyLevel,boss):
                 mana = mana + manaGain
     return exp,HP,mana
 
-def situations(num,player,pClass,name,exp,hp,mana):
+def situations(num,player,pClass,subclass,name,exp,hp,mana):
     if num == 1:
         print ('You come face to face with an enemy. What will you do? (Type to choose choice)')
-        return battle(num,player,pClass,name,exp,hp,mana,False)
+        return battle(num,player,pClass,subclass,name,exp,hp,mana,False)
         
     elif num == 2:
         print ("It's an empty room...")
@@ -298,11 +406,11 @@ def situations(num,player,pClass,name,exp,hp,mana):
         if rand <= 0.45:
             os.system('pause')
             print ("You turn to leave and an enemy attacks you!")
-            return battle(num,player,pClass,name,exp,hp,mana,False)
+            return battle(num,player,pClass,subclass,name,exp,hp,mana,False)
         if rand >0.45 and rand < 0.50:
             os.system('pause')
             print ("The boss comes out of the shadows! You have to fight!")
-            return battle(num,player,pClass,name,exp,hp,mana,True)
+            return battle(num,player,pClass,subclass,name,exp,hp,mana,True)
         else:
             return exp,hp,mana
 
@@ -321,10 +429,10 @@ def situations(num,player,pClass,name,exp,hp,mana):
             encounter = random()
             if encounter <= 0.4:
                 print ("You encounter an enemy!")
-                return battle(num,player,pClass,name,exp,hp,mana,False)
+                return battle(num,player,pClass,subclass,name,exp,hp,mana,False)
             else:
                 print ('You Obtained an item!')
-                player[name][2].append('Mango')
+                player[name][2].append(items[randint(0,2)])
                 return exp,hp,mana
 
 def critChance():
@@ -381,8 +489,32 @@ def healing (hp):
     if hp > player[name][0]['HP']:
         hp = player[name][0]['HP']
     return hp
+
+def manaRestore(mana):
+    rand = random()
+    if rand <= 0.1:
+        print ("You ate a Big Sweet Chenette! Mana fully restored!")
+        mana = player[name][0]['Mana']
+    elif rand > 0.10 and rand <= 0.30:
+        print ("You ate a Sweet Chenette! Gained", round(player[name][0]['Mana'] * 0.75), "Mana!")
+        mana += round(player[name][0]['Mana'] * 0.75)
+    elif rand > 0.30 and rand <= 0.65:
+        print ("You ate a Chenette! Gained", round(player[name][0]['Mana'] * 0.50), "Mana!")
+        mana += round(player[name][0]['Mana'] * 0.50)
+    elif rand > 0.65:
+        print ("You ate an Ok Chenette! Gained", round(player[name][0]['Mana'] * 0.25), "Mana!")
+        mana += round(player[name][0]['Mana'] * 0.25)
+
+    if mana > player[name][0]['Mana']:
+        mana = player[name][0]['Mana']
+    return mana
 player,pClass,name = createCharacter()
 exp=player[name][1]**3
+subclass = list(player[name][0]["Subclass"].keys())
+if player[name][0]["Subclass"][subclass[0]] == True:
+    subclass = subclass[0]
+else:
+    subclass = subclass[1]
 leave = False
 hp = player[name][0]['HP']
 mana = player[name][0]['Mana']
@@ -414,7 +546,7 @@ while leave == False and hp > 0:
             num = 2
         elif sit > 0.70 and sit <= 1.0:
             num = 3
-        new = situations(num,player,pClass,name,exp,hp,mana)
+        new = situations(num,player,pClass,subclass,name,exp,hp,mana)
         exp = new[0]
         hp = new[1]
         mana = new[2]
