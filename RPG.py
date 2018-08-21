@@ -286,10 +286,13 @@ def specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel
             mana = mana - 20
             print ("You use your magic to manipulate the enemy's blood!")
             damage = round(((((2 * player[name][1] / 5 + 2) * player[name][0]['Atk'] * randint(30,100) / enemy['Monster'][2]) / 50) + 2) * randint(1,100) / 100)
-            hp = hp + round(damage * 0.67)
+            if enemyHp - damage < 0:
+                hp = hp + round(enemyHp * 0.67)
+            else:
+                hp = hp + round(damage * 0.67)
+            enemyHp -= damage
             if hp > player[name][0]['HP']:
                 hp = player[name][0]['HP']
-            enemyHp -= damage
             if damage == 0:
                 print ("You tried to cast your magic but it failed!")
                 mana = mana + 10
