@@ -36,6 +36,9 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
     enemyAlive = True
     Alive = True
     scanned = False
+    atkBuff = 0
+    defBuff = 0
+    spdBuff = 0
     enemyLevel = randint((player[name][1]-2),(player[name][1]+2))
     if enemyLevel < 1:
         enemyLevel = 1
@@ -61,9 +64,9 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
         choice = input('Stats       Special     Run\n')
         choice = choice.lower()
         if choice == 'attack':
-            crit,dodge,damage = calDamage(player[name][0]['Atk'],enemy['Monster'][2],player[name][1])
-            enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],player[name][0]['Def'],enemyLevel)           
-            if turnOrder(player[name][0]['Spd'],enemy['Monster'][3]) == 1:
+            crit,dodge,damage = calDamage((player[name][0]['Atk']+atkBuff),enemy['Monster'][2],player[name][1])
+            enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],(player[name][0]['Def']+defBuff),enemyLevel)           
+            if turnOrder((player[name][0]['Spd']+spdBuff),enemy['Monster'][3]) == 1:
                 if damage > 0:
                     if crit == 1:
                         print ("SMASH! You did " + str(damage) + " critical damage!")
@@ -196,9 +199,9 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
                 
         elif choice == 'stats':
             stats = player[name][0]
-            print ('Attack: ' + str(stats['Atk']))
-            print ('Defense: ' + str(stats['Def']))
-            print ('Speed: ' + str(stats['Spd']))
+            print ('Attack: ' + str(stats['Atk']+atkBuff))
+            print ('Defense: ' + str(stats['Def']+defBuff))
+            print ('Speed: ' + str(stats['Spd']+spdBuff))
             
         elif choice == 'scan':
             if scanned == False:
@@ -214,9 +217,9 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
                 print ("You have already scanned this enemy!")
 
         elif choice == 'special':
-            enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],player[name][0]['Def'],enemyLevel)
+            enCrit,enDodge,enAttack = calDamage(enemy['Monster'][1],player[name][0]['Def']+defBuff,enemyLevel)
             if turnOrder(player[name][0]['Spd'],enemy['Monster'][3]) == 1:                
-                exp,hp,mana,enemyHp,enemyAlive = specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel)
+                exp,hp,mana,atkBuff,defBuff,spdBuff,enemyHp,enemyAlive = specialAttack(player,subclass,name,exp,hp,mana,atkBuff,defBuff,spdBuff,enemy,enemyHp,boss,enemyLevel,enAttack)
                 if enemyAlive == False:         
                     return exp,hp,mana
                 
@@ -254,7 +257,7 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
                     print ('You Died...')
                     return exp,hp,mana
 
-                exp,hp,mana,enemyHp,enemyAlive = specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel)
+                exp,hp,mana,atkBuff,defBuff,spdBuff,enemyHp,enemyAlive = specialAttack(player,subclass,name,exp,hp,mana,atkBuff,defBuff,spdBuff,enemy,enemyHp,boss,enemyLevel,enAttack)
                 if enemyAlive == False:
                     return exp,hp,mana
         else:
@@ -262,10 +265,18 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
         os.system('pause')
         os.system('CLS')
 
-def specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel):
+def specialAttack(player,subclass,name,exp,hp,mana,atkBuff,defBuff,spdBuff,enemy,enemyHp,boss,enemyLevel,enAttack):
     alive = True
     if subclass == 'Brusier':
-        print("Coming Soon™!")
+        mana -= 10
+        damage = round(((((2 * player[name][1] / 5 + 2) * player[name][0]['Atk'] * randint(150,200) / enemy['Monster'][2]) / 50) + 2) * (randint(1,100) / 100))
+        enemyHp -= damage
+        hp = hp - round(damage * 0.20)
+        print("You strike with the force of give or take a few hundred suns")
+        print("You dealt " + str(damage) + " holy damage!")
+        print("You took " + str(round(damage * 0.20)) + " splash damage!")
+        if hp < 0:
+            hp = 1
         
     elif subclass == 'Paladin':
         if mana >= 25:
@@ -279,13 +290,27 @@ def specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel
             print ("Not Enough Mana!")
             
     elif subclass == 'Wizard':
-        print("Coming Soon™!")
-        
+        if mana >= 12:
+            mana -= 12
+            print("You cast a dark magic to gain an advantage against the opponent!")
+            buff = random()
+            if buff <= 0.33:
+                atkBuff = randint(3,5)
+                print ("A harsh red light casts down upon you\nYou gained " + str(atkBuff) + " Attack!")
+            elif buff > 0.33 and buff <= 0.67:
+                defBuff = randint(3,5)
+                print ("A subtle green light casts down upon you\nYou gained " + str(defBuff) + " Defense!")
+            elif buff > 0.67:
+                spdBuff = randint(3,5)
+                print ("A quick blue light casts down upon you\nYou gained " + str(spdBuff) + " Speed!")
+        else:
+            print ("Not Enough Mana!")
+
     elif subclass == 'Hemomancer':
         if mana >= 20:
             mana = mana - 20
             print ("You use your magic to manipulate the enemy's blood!")
-            damage = round(((((2 * player[name][1] / 5 + 2) * player[name][0]['Atk'] * randint(30,100) / enemy['Monster'][2]) / 50) + 2) * randint(1,100) / 100)
+            damage = round(((((2 * player[name][1] / 5 + 2) * player[name][0]['Atk'] * randint(30,100) / enemy['Monster'][2]) / 50) + 2) * (randint(1,100) / 100))
             if enemyHp - damage < 0:
                 hp = hp + round(enemyHp * 0.67)
             else:
@@ -298,15 +323,6 @@ def specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel
                 mana = mana + 10
             else:
                 print ("You dealt " + str(damage) + " damage and healed for two thirds of that")
-            if enemyHp < 0:
-                if boss == False:
-                    print ('You won the battle!')
-                elif boss == True:
-                    print ('You beat the boss!')
-                    print ('You Obtained an item!')
-                    player[name][2].append(items[randint(0,2)])
-                exp,hp,mana = levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
-                alive = False
         else:
             print ("Not Enough Mana!")
             
@@ -327,8 +343,16 @@ def specialAttack(player,subclass,name,exp,hp,mana,enemy,enemyHp,boss,enemyLevel
         
     elif subclass == "Warden":
         print("Coming Soon™!")
-        
-    return exp,hp,mana,enemyHp,alive
+    if enemyHp < 0:
+        if boss == False:
+            print ('You won the battle!')
+        elif boss == True:
+            print ('You beat the boss!')
+            print ('You Obtained an item!')
+            player[name][2].append(items[randint(0,2)])
+        exp,hp,mana = levelUp(exp,player,pClass,hp,mana,enemyLevel,boss)
+        alive = False    
+    return exp,hp,mana,atkBuff,defBuff,spdBuff,enemyHp,alive
             
 def levelUp(exp,player,Class,HP,mana,enemyLevel,boss):
     nextLevel = player[name][1]+1
@@ -459,7 +483,7 @@ def dodgeChance():
 def calDamage(attack,defense,level):
     crit = critChance()
     dodge = dodgeChance()
-    damage = round(((((2 * level / 5 + 2) * attack * randint(30,100) / defense) / 50) + 2) * randint(1,100) / 100)
+    damage = round(((((2 * level / 5 + 2) * attack * randint(30,100) / defense) / 50) + 2) * (randint(1,100) / 100))
     if crit == 1:
         damage *= 1.5
     if dodge == 1:
