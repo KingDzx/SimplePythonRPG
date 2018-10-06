@@ -192,8 +192,12 @@ def battle(num,player,pClass,subclass,name,exp,hp,mana,boss):
                     player[name][2].remove(item)
                     if item == 'Mango':
                         hp = healing(hp)
-                    if item == 'Chenette':
+                    elif item == 'Chenette':
                         mana = manaRestore(mana)
+                    elif item == 'Mango':
+                        add = random(3,5)
+                        atkBuff += add
+                        print ("You ate a mango\nAttack Raised by ", add)
                 if (item == 'Back'):
                     print ("")
                 
