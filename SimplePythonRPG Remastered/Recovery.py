@@ -3,7 +3,7 @@ def healing (currHP,hp):
     rand = random()
     if rand <= 0.1:
         print ("You ate a Super Julie Starch Mango! HP fully restored!")
-        currHp = hp
+        currHp += hp
     elif rand > 0.10 and rand <= 0.30:
         print ("You ate a Julie Starch Mango! Gained", round(hp * 0.75), "HP!")
         currHP += round(hp * 0.75)
@@ -22,7 +22,7 @@ def manaRestore(currMana,mana):
     rand = random()
     if rand <= 0.1:
         print ("You ate a Big Sweet Chenette! Mana fully restored!")
-        currMana = mana
+        currMana += mana
     elif rand > 0.10 and rand <= 0.30:
         print ("You ate a Sweet Chenette! Gained", round(mana * 0.75), "Mana!")
         currMana += round(mana * 0.75)
@@ -36,6 +36,3 @@ def manaRestore(currMana,mana):
     if currMana > mana:
         currMana = mana
     return currMana
-
-        
-        

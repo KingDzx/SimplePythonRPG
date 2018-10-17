@@ -29,9 +29,9 @@ while leave == False and main.currHp > 0:
             sit = random()
             if sit <= 0.4:
                 num = 1
-            elif 0.4 < sit <= 0.70:
+            elif 0.4 < sit <= 0.75:
                 num = 2
-            elif 0.70 < sit <= 1.0:
+            elif 0.75 < sit <= 1.0:
                 num = 3
             sits(num, main)
     else:

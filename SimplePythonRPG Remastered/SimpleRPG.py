@@ -1,19 +1,18 @@
 from Classes import *
-from Monster import Monster
+from Subclasses import *
+from Monster import *
 from BattleFunctions import *
 from Recovery import *
 from random import random, randint
 import os
-from math import *
 
 stats = {
-    'Warrior': {'Subclass': {'Bruiser': False, 'Paladin': False}},
-    'Mage': {'Subclass': {'Wizard': False, 'Hemomancer': False}},
-    'Assassin': {'Subclass': {'Ninja': False, 'Rogue': False}},
-    'Marksman': {'Subclass': {'Sniper': False, 'Archer': False}},
-    'Tank': {'Subclass': {'Vanguard': False, 'Warden': False}}
+    'Warrior':{'Bruiser': Bruiser, 'Paladin': Paladin},
+    'Mage': {'Wizard': Wizard, 'Hemomancer': Hemomancer},
+    'Assassin': {'Ninja': Ninja, 'Rogue': Rogue},
+    'Marksman': {'Sniper': Sniper, 'Archer': Archer},
+    'Tank': {'Vanguard': Vanguard, 'Warden': Warden}
 }
-func_dict = {'Mage': Mage, 'Warrior': Warrior, "Assassin": Assassin, 'Marksman': Marksman, 'Tank': Tank}
 items = ["Mango", "Chenette", "Doubles"]
 
 
@@ -21,25 +20,25 @@ def createCharacter():
     name = input("Enter Character Name \n")
     rpg_class = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
     rpg_class = rpg_class.capitalize()
-    level = 5
     while rpg_class != "Warrior" and rpg_class != "Mage" and rpg_class != "Assassin" and rpg_class != "Marksman" and rpg_class != "Tank":
         print('Please choose a valid class')
         rpg_class = input("Enter Wanted Class (Warrior/Mage/Assassin/Marksman/Tank) \n")
         rpg_class = rpg_class.capitalize()
-    subclass_choice = list(stats[rpg_class]['Subclass'].keys())
+    subclass_choice = list(stats[rpg_class].keys())
     subclass = input("Select a subclass from " + subclass_choice[0] + " or " + subclass_choice[1] + "\n")
     subclass = subclass.capitalize()
     while subclass not in subclass_choice:
         print('Please choose a subclass from the list provided')
         subclass = input("Select a subclass from " + subclass_choice[0] + " or " + subclass_choice[1] + "\n")
         subclass = subclass.capitalize()
-    return func_dict[rpg_class](name)
+
+    return stats[rpg_class][subclass](name)
 
 
 def sits(num, char):
     if num == 1:
         print('You come face to face with an enemy. What will you do? (Type to choose choice)')
-        battle(char,False)
+        battle(char, False)
     elif num == 2:
         emptyRoom(char)
     elif num == 3:
@@ -50,10 +49,13 @@ def battle(char, boss):
     ad_buff = 0
     df_buff = 0
     sp_buff = 0
-    enemy = Monster(char.Level)
+    if boss:
+        enemy = Boss(char.Level)
+    else:
+        enemy = Monster(char.Level)
     run_attempt = 1
     scanned = 2
-    while enemy.isAlive() == True and char.isAlive() == True:
+    while enemy.isAlive() and char.isAlive():
         print('                             ' + enemy.Name + ": Lv " + str(enemy.Level))
         print('                             HP: ' + str(enemy.currHp) + '/' + str(enemy.Hp))
         print(char.Name + ": Lv " + str(char.Level))
@@ -141,6 +143,7 @@ def battle(char, boss):
                         char.inventory.append(items[randint(0, 2)])
                     char.addExp(enemy.Level, boss)
                     return
+
         elif choice == 'run':
             '''
             # if boss == True:
@@ -173,6 +176,7 @@ def battle(char, boss):
 
                 if not char.isAlive():
                     print('You Died...')
+
         elif choice == 'item':
             if len(char.inventory) == 0:
                 print("You have no items")
@@ -196,6 +200,7 @@ def battle(char, boss):
                         print("You ate a doubles\nAttack Raised by", add)
                 if item == 'Back':
                     print("")
+
         elif choice == 'stats':
             print('Attack: ' + str(char.Atk + ad_buff) + "(" + str(ad_buff) + ")")
             print('Defense: ' + str(char.Def + df_buff) + "(" + str(df_buff) + ")")
@@ -213,6 +218,68 @@ def battle(char, boss):
                 scanned -= 1
             else:
                 print("You have already scanned this enemy!")
+
+        elif choice == 'special':
+            enCrit, enDodge, enAttack = enemy.Attack(char.Def)
+            if turnOrder(char.Spd, enemy.Spd) == 1:
+                char.specialAttack(enemy)
+
+                if not enemy.isAlive():
+                    if not boss:
+                        print('You won the battle!')
+                    else:
+                        print('You beat the boss!')
+                        print('You Obtained an item!')
+                        char.inventory.append(items[randint(0, 2)])
+                    char.addExp(enemy.Level, boss)
+                    return
+
+                if enAttack > 0:
+                    if enCrit == 1:
+                        print("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                    else:
+                        print('Monster did ' + str(enAttack) + " damage!")
+                    char.takeDamage(enAttack)
+                else:
+                    if enDodge == 1:
+                        print("Nice! you dodged the attack")
+                    else:
+                        print("Monster's attack missed!")
+
+                if not char.isAlive():
+                    print('You Died...')
+                    return
+
+            else:
+
+                if enAttack > 0:
+                    if enCrit == 1:
+                        print("CRAP! Monster did " + str(enAttack) + " critical damage!")
+                    else:
+                        print('Monster did ' + str(enAttack) + " damage!")
+                    char.takeDamage(enAttack)
+                else:
+                    if enDodge == 1:
+                        print("Nice! you dodged the attack")
+                    else:
+                        print("Monster's attack missed!")
+
+                if not char.isAlive():
+                    print('You Died...')
+                    return
+
+                char.specialAttack(enemy)
+
+                if not enemy.isAlive():
+                    if not boss:
+                        print('You won the battle!')
+                    else:
+                        print('You beat the boss!')
+                        print('You Obtained an item!')
+                        char.inventory.append(items[randint(0, 2)])
+                    char.addExp(enemy.Level, boss)
+                    return
+
         else:
             print("Not a valid choice")
         os.system('pause')
@@ -222,11 +289,11 @@ def battle(char, boss):
 def emptyRoom(char):
     print("It's an empty room...")
     rand = random()
-    if rand <= 0.45:
+    if rand <= 0.40:
         os.system('pause')
         print("You turn to leave and an enemy attacks you!")
         battle(char, False)
-    if 0.45 < rand < 0.50:
+    if 0.40 < rand < 0.50:
         os.system('pause')
         print("The boss comes out of the shadows! You have to fight!")
         battle(char, True)
