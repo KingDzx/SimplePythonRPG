@@ -1,4 +1,4 @@
-import BattleFunctions
+from BattleFunctions import *
 class Entity():
     def __init__(self,Hp,Atk,Def,Spd,Level,Name):
         self.Name = Name
@@ -10,7 +10,7 @@ class Entity():
         self.Level = Level
         
     def Attack(self,Def):
-        crit,dodge,damage = BattleFunctions.calDamage(self.Atk,Def,self.Level)
+        crit,dodge,damage = calDamage(self.Atk,Def,self.Level)
         return crit,dodge,damage
     
     def takeDamage(self,damage):

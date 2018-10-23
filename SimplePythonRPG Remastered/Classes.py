@@ -1,6 +1,7 @@
 from Character import Character
 from math import floor, sqrt
 from random import randint
+from PySimpleGUI import Popup
 
 
 class Mage(Character): # +Atk +Mana -Spd
@@ -19,25 +20,26 @@ class Mage(Character): # +Atk +Mana -Spd
         self.exp += gain
         lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)  # (player[name][1]+1)**3
         if self.Level < 100:
-            print('You gained ' + str(gain) + ' exp')
+            Popup('You gained ' + str(gain) + ' exp')
         while self.exp > lvlup:
             if self.Level == 100:
                 break
             if self.Level < 100:
                 if self.exp > lvlup:
-                    print('You gained a level!')
+
                     hpGain = randint(2, 7)
                     atkGain = int(floor(randint(1, 4) * 1.5))
                     defGain = randint(1, 4)
                     spdGain = int(floor(randint(1, 4) * 0.5))
-                    manaGain = int(floor(randint(5, 10) * 1.5))
+                    manaGain = int(floor(randint(5, 10) * 1.25))
 
-                    print('HP:', self.Hp, "+", hpGain, "=", self.Hp + hpGain)
-                    print('Attack:', self.Atk, "+", atkGain, "=", self.Atk + atkGain)
-                    print('Defense:', self.Def, "+", defGain, "=", self.Def + defGain)
-                    print('Speed:', self.Spd, "+", spdGain, "=", self.Spd + spdGain)
-                    print('Mana:', self.mana, "+", manaGain, "=", self.mana + manaGain)
-                    print('\n')
+                    Popup('You gained a level!',
+                          'HP: ' + str(self.Hp) + " + " + str(hpGain) + " = " + str(self.Hp + hpGain),
+                          'Attack: ' + str(self.Atk) + " + " + str(atkGain) + " = " + str(self.Atk + atkGain),
+                          'Defense: ' + str(self.Def) + " + " + str(defGain) + " = " + str(self.Def + defGain),
+                          'Speed: ' + str(self.Spd) + " + " + str(spdGain) + " = " + str(self.Spd + spdGain),
+                          'Mana: ' + str(self.mana) + " + " + str(manaGain) + " = " + str(self.mana + manaGain))
+
                     self.Level += 1
                     self.Hp += hpGain
                     self.Atk += atkGain
@@ -66,25 +68,25 @@ class Assassin(Character): # +Atk +Spd -HP
         self.exp += gain
         lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)  # (player[name][1]+1)**3
         if self.Level < 100:
-            print('You gained ' + str(gain) + ' exp')
+            Popup('You gained ' + str(gain) + ' exp')
         while self.exp > lvlup:
             if self.Level == 100:
                 break
             if self.Level < 100:
                 if self.exp > lvlup:
-                    print('You gained a level!')
                     hpGain = int(floor(randint(2, 7) * 0.5))
                     atkGain = randint(3, 5)
                     defGain = randint(1, 4)
                     spdGain = randint(3, 5)
                     manaGain = randint(5, 10)
 
-                    print('HP:', self.Hp, "+", hpGain, "=", self.Hp + hpGain)
-                    print('Attack:', self.Atk, "+", atkGain, "=", self.Atk + atkGain)
-                    print('Defense:', self.Def, "+", defGain, "=", self.Def + defGain)
-                    print('Speed:', self.Spd, "+", spdGain, "=", self.Spd + spdGain)
-                    print('Mana:', self.mana, "+", manaGain, "=", self.mana + manaGain)
-                    print('\n')
+                    Popup('You gained a level!',
+                          'HP: ' + str(self.Hp) + " + " + str(hpGain) + " = " + str(self.Hp + hpGain),
+                          'Attack: ' + str(self.Atk) + " + " + str(atkGain) + " = " + str(self.Atk + atkGain),
+                          'Defense: ' + str(self.Def) + " + " + str(defGain) + " = " + str(self.Def + defGain),
+                          'Speed: ' + str(self.Spd) + " + " + str(spdGain) + " = " + str(self.Spd + spdGain),
+                          'Mana: ' + str(self.mana) + " + " + str(manaGain) + " = " + str(self.mana + manaGain))
+
                     self.Level += 1
                     self.Hp += hpGain
                     self.Atk += atkGain
@@ -113,25 +115,25 @@ class Warrior(Character): # +Atk +Def -HP
         self.exp += gain
         lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)  # (player[name][1]+1)**3
         if self.Level < 100:
-            print('You gained ' + str(gain) + ' exp')
+            Popup('You gained ' + str(gain) + ' exp')
         while self.exp > lvlup:
             if self.Level == 100:
                 break
             if self.Level < 100:
                 if self.exp > lvlup:
-                    print('You gained a level!')
                     hpGain = int(floor(randint(2, 7) * 0.5))
                     atkGain = randint(3, 5)
                     defGain = randint(3, 5)
                     spdGain = randint(1, 4)
                     manaGain = randint(5, 10)
 
-                    print('HP:', self.Hp, "+", hpGain, "=", self.Hp + hpGain)
-                    print('Attack:', self.Atk, "+", atkGain, "=", self.Atk + atkGain)
-                    print('Defense:', self.Def, "+", defGain, "=", self.Def + defGain)
-                    print('Speed:', self.Spd, "+", spdGain, "=", self.Spd + spdGain)
-                    print('Mana:', self.mana, "+", manaGain, "=", self.mana + manaGain)
-                    print('\n')
+                    Popup('You gained a level!',
+                          'HP: ' + str(self.Hp) + " + " + str(hpGain) + " = " + str(self.Hp + hpGain),
+                          'Attack: ' + str(self.Atk) + " + " + str(atkGain) + " = " + str(self.Atk + atkGain),
+                          'Defense: ' + str(self.Def) + " + " + str(defGain) + " = " + str(self.Def + defGain),
+                          'Speed: ' + str(self.Spd) + " + " + str(spdGain) + " = " + str(self.Spd + spdGain),
+                          'Mana: ' + str(self.mana) + " + " + str(manaGain) + " = " + str(self.mana + manaGain))
+
                     self.Level += 1
                     self.Hp += hpGain
                     self.Atk += atkGain
@@ -160,25 +162,25 @@ class Tank(Character):  # +Def +HP -Atk
         self.exp += gain
         lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)  # (player[name][1]+1)**3
         if self.Level < 100:
-            print('You gained ' + str(gain) + ' exp')
+            Popup('You gained ' + str(gain) + ' exp')
         while self.exp > lvlup:
             if self.Level == 100:
                 break
             if self.Level < 100:
                 if self.exp > lvlup:
-                    print('You gained a level!')
                     hpGain = randint(7, 10)
                     atkGain = int(floor(randint(1, 4) * 0.5))
                     defGain = randint(3, 5)
                     spdGain = randint(1, 4)
                     manaGain = randint(5, 10)
 
-                    print('HP:', self.Hp, "+", hpGain, "=", self.Hp + hpGain)
-                    print('Attack:', self.Atk, "+", atkGain, "=", self.Atk + atkGain)
-                    print('Defense:', self.Def, "+", defGain, "=", self.Def + defGain)
-                    print('Speed:', self.Spd, "+", spdGain, "=", self.Spd + spdGain)
-                    print('Mana:', self.mana, "+", manaGain, "=", self.mana + manaGain)
-                    print('\n')
+                    Popup('You gained a level!',
+                          'HP: ' + str(self.Hp) + " + " + str(hpGain) + " = " + str(self.Hp + hpGain),
+                          'Attack: ' + str(self.Atk) + " + " + str(atkGain) + " = " + str(self.Atk + atkGain),
+                          'Defense: ' + str(self.Def) + " + " + str(defGain) + " = " + str(self.Def + defGain),
+                          'Speed: ' + str(self.Spd) + " + " + str(spdGain) + " = " + str(self.Spd + spdGain),
+                          'Mana: ' + str(self.mana) + " + " + str(manaGain) + " = " + str(self.mana + manaGain))
+
                     self.Level += 1
                     self.Hp += hpGain
                     self.Atk += atkGain
@@ -207,7 +209,7 @@ class Marksman(Character): # +Spd -Def
         self.exp += gain
         lvlup = floor(1.2 * nextLevel ** 3 - 15 * nextLevel ** 2 + 100 * nextLevel - 140)  # (player[name][1]+1)**3
         if self.Level < 100:
-            print('You gained ' + str(gain) + ' exp')
+            Popup('You gained ' + str(gain) + ' exp')
         while self.exp > lvlup:
             if self.Level == 100:
                 break
@@ -220,12 +222,13 @@ class Marksman(Character): # +Spd -Def
                     spdGain = int(floor(randint(1, 4) * 1.5))
                     manaGain = randint(5, 10)
 
-                    print('HP:', self.Hp, "+", hpGain, "=", self.Hp + hpGain)
-                    print('Attack:', self.Atk, "+", atkGain, "=", self.Atk + atkGain)
-                    print('Defense:', self.Def, "+", defGain, "=", self.Def + defGain)
-                    print('Speed:', self.Spd, "+", spdGain, "=", self.Spd + spdGain)
-                    print('Mana:', self.mana, "+", manaGain, "=", self.mana + manaGain)
-                    print('\n')
+                    Popup('You gained a level!',
+                          'HP: ' + str(self.Hp) + " + " + str(hpGain) + " = " + str(self.Hp + hpGain),
+                          'Attack: ' + str(self.Atk) + " + " + str(atkGain) + " = " + str(self.Atk + atkGain),
+                          'Defense: ' + str(self.Def) + " + " + str(defGain) + " = " + str(self.Def + defGain),
+                          'Speed: ' + str(self.Spd) + " + " + str(spdGain) + " = " + str(self.Spd + spdGain),
+                          'Mana: ' + str(self.mana) + " + " + str(manaGain) + " = " + str(self.mana + manaGain))
+
                     self.Level += 1
                     self.Hp += hpGain
                     self.Atk += atkGain
