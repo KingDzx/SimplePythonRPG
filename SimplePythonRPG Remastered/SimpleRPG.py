@@ -220,7 +220,7 @@ def battle(char, boss):
                 if 4 < stat <= 8:
                     Popup("Monster's Defense: " + str(enemy.Def))
                 if stat > 8:
-                    Popup("Monster's Speed: " + str(enemy.spd))
+                    Popup("Monster's Speed: " + str(enemy.Spd))
                 scanned -= 1
                 Popup("You can scan " + str(scanned) + " more times")
             else:
