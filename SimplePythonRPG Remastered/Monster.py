@@ -1,7 +1,6 @@
 from Entity import Entity
 from random import randint, random
 
-
 class Monster(Entity):
     def __init__(self, Level):
         names = ["Phantomteeth", "Spitesnare", "Hellsnake", "Soulwing", "Dawnsoul"]

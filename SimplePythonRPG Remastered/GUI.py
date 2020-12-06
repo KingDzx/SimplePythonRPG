@@ -12,18 +12,24 @@ def initialScreen(hp, Atk, Def, Spd, mana):
               [Text("Mana:"), Text(mana)],
               [OK()]]
 
-    event, values = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout).Read()
+    window = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout)
+
+    event, values = window.Read()
+    window.Close()
 
 
 def walking():
     layout = [[Text('Pick a direction to go')],
-              [T(' ' * 11), Button('Up', default_value='Up')],
-              [Button('Left', default_value='Left'), T(' ' * 15),
-               Button('Right', default_value='Right')],
-              [T(' ' * 9), Button('Down', default_value='Down')],
+              [T(' ' * 11), Button('Up')],
+              [Button('Left'), T(' ' * 15),
+               Button('Right')],
+              [T(' ' * 9), Button('Down')],
               [Quit(button_color=('white', 'orange'))]]
 
-    event, values = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout).Read()
+    window = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout)
+
+    event, values = window.Read()
+    window.Close()
     return event
 
 
@@ -36,7 +42,10 @@ def HPbars(enemy, char):
               [Button('Attack'), Button('Item'), Button('Scan')],
               [Button('Stats'), Button('Special'), Button('Run')]]
 
-    event, values = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout).Read()
+    window = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout)
+
+    event, values = window.Read()
+    window.Close()
     return event
 
 
@@ -44,8 +53,11 @@ def listItems(inven):
     stuff = list(set(inven))
     layout = [[Text("Select the Item you wish to use")],
               [Listbox(values=stuff, size=(20, 5))],
-              [OK(), Button('Back', default_value='Back')]]
-    event, values = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout).Read()
+              [OK(), Button('Back')]]
+    window = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout)
+
+    event, values = window.Read()
+    window.Close()
     if event == 'Back':
         return event
     return values[0][0]

@@ -21,4 +21,3 @@ class Entity():
             return False
         else:
             return True
-        

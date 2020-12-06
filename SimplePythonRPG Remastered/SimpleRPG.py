@@ -23,7 +23,10 @@ def createCharacter():
               [InputCombo(['Mage', 'Assassin', 'Warrior', 'Tank', "Marksman"])],
               [OK()]]
 
-    event, values = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout).Read()
+    window = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout)
+
+    event, values = window.Read()
+    window.Close()
     name = values[0]
     rClass = values[1]
 
@@ -31,8 +34,10 @@ def createCharacter():
     layout = [[Text("Select a subclass from " + subclass_choice[0] + " or " + subclass_choice[1])],
               [InputCombo([subclass_choice[0], subclass_choice[1]])],
               [OK()]]
-    event, values = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(
-        layout).Read()
+    window = Window("SimplePythonRPG", auto_size_text=True, default_element_size=(40, 1)).Layout(layout)
+
+    event, values = window.Read()
+    window.Close()
     subclass = values[0]
 
     return stats[rClass][subclass](name)
@@ -306,17 +311,25 @@ def battle(char, boss):
 def emptyRoom(char):
     layout = [[Text("It's an empty room...")],
               [OK()]]
-    event, values = Window("SimplePythonRPG").Layout(layout).Read()
+
+    window = Window("SimplePythonRPG").Layout(layout)
+    event, values = window.Read()
+    window.Close()
+
     rand = random()
     if rand <= 0.40:
         layout = [[Text("You turn to leave and an enemy attacks you!")],
                   [OK()]]
-        event, values = Window("SimplePythonRPG").Layout(layout).Read()
+        window = Window("SimplePythonRPG").Layout(layout)
+        event, values = window.Read()
+        window.Close()
         battle(char, False)
     if 0.40 < rand < 0.50:
         layout = [[Text("The boss comes out of the shadows! You have to fight!")],
                   [OK()]]
-        event, values = Window("SimplePythonRPG").Layout(layout).Read()
+        window = Window("SimplePythonRPG").Layout(layout)
+        event, values = window.Read()
+        window.Close()
         battle(char, True)
 
 
@@ -324,7 +337,9 @@ def getItem(char):
     layout = [[Text("You enter a room, there's a chest!")],
               [Text("Will you open it?")],
               [Yes(), No()]]
-    choice, values = Window("SimplePythonRPG").Layout(layout).Read()
+    window = Window("SimplePythonRPG").Layout(layout)
+    choice, values = window.Read()
+    window.Close()
     if choice == 'No':
         Popup("You walked out. You don't trust what the chest might contain")
         #return
